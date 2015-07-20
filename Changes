@@ -1,0 +1,45 @@
+PESTS - Parse Excel Spreadsheets To Single
+Author:  Michael J. Vincent
+
+Version 2.3 - 20 JUL 2015
+
+Perl::Tidy for GitHub.
+
+
+Version 2.22 - 14 APR 2009
+
+Add list sheet name option by using -S without -W out workbook.
+
+
+Version 2.21 - 02 APR 2009
+
+Minor syntax adjustments.  Updated TEST files to reflect v2.2 updates.
+TEST Batch file will always throw errors UNLESS you have the SAME 
+directory structure as in the file "ORIG.LOG".  You can edit the 
+directory listings in that file to mirror the directory structure 
+you will run test from.
+
+
+Version 2.2 - 10 MAR 2009
+
+Updated -S options for sheet mapping mode.  Added support for sheet
+specification in -C argument.
+
+
+Version 2.1 - 09 MAR 2009
+
+Added -S options for sheet mapping mode.
+
+
+Version 2.0 - 15 DEC 2008
+
+Converted to Win32::OLE instead of previous Spreadsheet:: implementation.
+
+Added more options including file types (CSV, TXT, XLS), output cell start
+and modularized printing.
+
+
+Version 1.x - 
+
+Used Spreadsheet::ParseExcel and Spreadsheet::WriteExcel.
+

@@ -1,0 +1,422 @@
+C: ..\pests  
+b1s1r1c1	b1s1r1c2	b1s1r1c3	b1s1r2c1	b1s1r2c2		b1s1r3c1	b1s1r3c2	b1s1r3c3	b1s1r4c1	b1s1r4c2		b1s2r1c1	b1s2r1c2	b1s2r1c3	b1s2r2c1	b1s2r2c2		b1s2r3c1	b1s2r3c2	b1s2r3c3	b1s2r4c1	b1s2r4c2		
+b2s1r2c2	b2s1r2c3	b2s1r2c4	b2s1r3c2	b2s1r3c3		b2s1r4c2	b2s1r4c3	b2s1r4c4	b2s1r5c2	b2s1r5c3		b2s2r2c2	b2s2r2c3	b2s2r2c4	b2s2r3c2	b2s2r3c3		b2s2r4c2	b2s2r4c3	b2s2r4c4	b2s2r5c2	b2s2r5c3		
+ 
+C: ..\pests -d  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1
+1!1:2 = b1s1r1c2
+1!1:3 = b1s1r1c3
+1!2:1 = b1s1r2c1
+1!2:2 = b1s1r2c2
+1!2:3 = 
+1!3:1 = b1s1r3c1
+1!3:2 = b1s1r3c2
+1!3:3 = b1s1r3c3
+1!4:1 = b1s1r4c1
+1!4:2 = b1s1r4c2
+1!4:3 = 
+2!1:1 = b1s2r1c1
+2!1:2 = b1s2r1c2
+2!1:3 = b1s2r1c3
+2!2:1 = b1s2r2c1
+2!2:2 = b1s2r2c2
+2!2:3 = 
+2!3:1 = b1s2r3c1
+2!3:2 = b1s2r3c2
+2!3:3 = b1s2r3c3
+2!4:1 = b1s2r4c1
+2!4:2 = b1s2r4c2
+2!4:3 = 
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!2:2 = b2s1r2c2
+1!2:3 = b2s1r2c3
+1!2:4 = b2s1r2c4
+1!3:2 = b2s1r3c2
+1!3:3 = b2s1r3c3
+1!3:4 = 
+1!4:2 = b2s1r4c2
+1!4:3 = b2s1r4c3
+1!4:4 = b2s1r4c4
+1!5:2 = b2s1r5c2
+1!5:3 = b2s1r5c3
+1!5:4 = 
+2!2:2 = b2s2r2c2
+2!2:3 = b2s2r2c3
+2!2:4 = b2s2r2c4
+2!3:2 = b2s2r3c2
+2!3:3 = b2s2r3c3
+2!3:4 = 
+2!4:2 = b2s2r4c2
+2!4:3 = b2s2r4c3
+2!4:4 = b2s2r4c4
+2!5:2 = b2s2r5c2
+2!5:3 = b2s2r5c3
+2!5:4 = 
+
+ 
+C: ..\pests -c 1:1;1:2;1:3;2:2;2:3;2:4  
+b1s1r1c1	b1s1r1c2	b1s1r1c3	b1s1r2c2			
+			b2s1r2c2	b2s1r2c3	b2s1r2c4	
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1
+1!1:2 = b1s1r1c2
+1!1:3 = b1s1r1c3
+1!2:2 = b1s1r2c2
+1!2:3 = 
+1!2:4 = 
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 
+1!1:2 = 
+1!1:3 = 
+1!2:2 = b2s1r2c2
+1!2:3 = b2s1r2c3
+1!2:4 = b2s1r2c4
+
+ 
+C: ..\pests -t txt,csv  
+CSVr1c1	CSVr1c2	CSVr1c3	CSVr2c1	CSVr2c2		CSVr3c1	CSVr3c2	CSVr3c3	CSVr4c1	CSVr4c2		
+TXTr1c1	TXTr1c2	TXTr1c3	TXTr2c1	TXTr2c2		TXTr3c1	TXTr3c2	TXTr3c3	TXTr4c1	TXTr4c2		
+ 
+C: ..\pests -t txt,csv -d -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.csv
+1!1:1 = CSVr1c1	-> out.xls(1!1:1)
+1!1:2 = CSVr1c2	-> out.xls(1!1:2)
+1!1:3 = CSVr1c3	-> out.xls(1!1:3)
+1!2:1 = CSVr2c1	-> out.xls(1!1:4)
+1!2:2 = CSVr2c2	-> out.xls(1!1:5)
+1!2:3 = 	-> out.xls(1!1:6)
+1!3:1 = CSVr3c1	-> out.xls(1!1:7)
+1!3:2 = CSVr3c2	-> out.xls(1!1:8)
+1!3:3 = CSVr3c3	-> out.xls(1!1:9)
+1!4:1 = CSVr4c1	-> out.xls(1!1:10)
+1!4:2 = CSVr4c2	-> out.xls(1!1:11)
+1!4:3 = 	-> out.xls(1!1:12)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.txt
+1!1:1 = TXTr1c1	-> out.xls(1!2:1)
+1!1:2 = TXTr1c2	-> out.xls(1!2:2)
+1!1:3 = TXTr1c3	-> out.xls(1!2:3)
+1!2:1 = TXTr2c1	-> out.xls(1!2:4)
+1!2:2 = TXTr2c2	-> out.xls(1!2:5)
+1!2:3 = 	-> out.xls(1!2:6)
+1!3:1 = TXTr3c1	-> out.xls(1!2:7)
+1!3:2 = TXTr3c2	-> out.xls(1!2:8)
+1!3:3 = TXTr3c3	-> out.xls(1!2:9)
+1!4:1 = TXTr4c1	-> out.xls(1!2:10)
+1!4:2 = TXTr4c2	-> out.xls(1!2:11)
+1!4:3 = 	-> out.xls(1!2:12)
+
+ 
+C: ..\pests -d -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!1:2)
+1!1:3 = b1s1r1c3	-> out.xls(1!1:3)
+1!2:1 = b1s1r2c1	-> out.xls(1!1:4)
+1!2:2 = b1s1r2c2	-> out.xls(1!1:5)
+1!2:3 = 	-> out.xls(1!1:6)
+1!3:1 = b1s1r3c1	-> out.xls(1!1:7)
+1!3:2 = b1s1r3c2	-> out.xls(1!1:8)
+1!3:3 = b1s1r3c3	-> out.xls(1!1:9)
+1!4:1 = b1s1r4c1	-> out.xls(1!1:10)
+1!4:2 = b1s1r4c2	-> out.xls(1!1:11)
+1!4:3 = 	-> out.xls(1!1:12)
+2!1:1 = b1s2r1c1	-> out.xls(1!1:13)
+2!1:2 = b1s2r1c2	-> out.xls(1!1:14)
+2!1:3 = b1s2r1c3	-> out.xls(1!1:15)
+2!2:1 = b1s2r2c1	-> out.xls(1!1:16)
+2!2:2 = b1s2r2c2	-> out.xls(1!1:17)
+2!2:3 = 	-> out.xls(1!1:18)
+2!3:1 = b1s2r3c1	-> out.xls(1!1:19)
+2!3:2 = b1s2r3c2	-> out.xls(1!1:20)
+2!3:3 = b1s2r3c3	-> out.xls(1!1:21)
+2!4:1 = b1s2r4c1	-> out.xls(1!1:22)
+2!4:2 = b1s2r4c2	-> out.xls(1!1:23)
+2!4:3 = 	-> out.xls(1!1:24)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!2:2 = b2s1r2c2	-> out.xls(1!2:1)
+1!2:3 = b2s1r2c3	-> out.xls(1!2:2)
+1!2:4 = b2s1r2c4	-> out.xls(1!2:3)
+1!3:2 = b2s1r3c2	-> out.xls(1!2:4)
+1!3:3 = b2s1r3c3	-> out.xls(1!2:5)
+1!3:4 = 	-> out.xls(1!2:6)
+1!4:2 = b2s1r4c2	-> out.xls(1!2:7)
+1!4:3 = b2s1r4c3	-> out.xls(1!2:8)
+1!4:4 = b2s1r4c4	-> out.xls(1!2:9)
+1!5:2 = b2s1r5c2	-> out.xls(1!2:10)
+1!5:3 = b2s1r5c3	-> out.xls(1!2:11)
+1!5:4 = 	-> out.xls(1!2:12)
+2!2:2 = b2s2r2c2	-> out.xls(1!2:13)
+2!2:3 = b2s2r2c3	-> out.xls(1!2:14)
+2!2:4 = b2s2r2c4	-> out.xls(1!2:15)
+2!3:2 = b2s2r3c2	-> out.xls(1!2:16)
+2!3:3 = b2s2r3c3	-> out.xls(1!2:17)
+2!3:4 = 	-> out.xls(1!2:18)
+2!4:2 = b2s2r4c2	-> out.xls(1!2:19)
+2!4:3 = b2s2r4c3	-> out.xls(1!2:20)
+2!4:4 = b2s2r4c4	-> out.xls(1!2:21)
+2!5:2 = b2s2r5c2	-> out.xls(1!2:22)
+2!5:3 = b2s2r5c3	-> out.xls(1!2:23)
+2!5:4 = 	-> out.xls(1!2:24)
+
+ 
+C: ..\pests -d -R -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!2:1)
+1!1:3 = b1s1r1c3	-> out.xls(1!3:1)
+1!2:1 = b1s1r2c1	-> out.xls(1!4:1)
+1!2:2 = b1s1r2c2	-> out.xls(1!5:1)
+1!2:3 = 	-> out.xls(1!6:1)
+1!3:1 = b1s1r3c1	-> out.xls(1!7:1)
+1!3:2 = b1s1r3c2	-> out.xls(1!8:1)
+1!3:3 = b1s1r3c3	-> out.xls(1!9:1)
+1!4:1 = b1s1r4c1	-> out.xls(1!10:1)
+1!4:2 = b1s1r4c2	-> out.xls(1!11:1)
+1!4:3 = 	-> out.xls(1!12:1)
+2!1:1 = b1s2r1c1	-> out.xls(1!13:1)
+2!1:2 = b1s2r1c2	-> out.xls(1!14:1)
+2!1:3 = b1s2r1c3	-> out.xls(1!15:1)
+2!2:1 = b1s2r2c1	-> out.xls(1!16:1)
+2!2:2 = b1s2r2c2	-> out.xls(1!17:1)
+2!2:3 = 	-> out.xls(1!18:1)
+2!3:1 = b1s2r3c1	-> out.xls(1!19:1)
+2!3:2 = b1s2r3c2	-> out.xls(1!20:1)
+2!3:3 = b1s2r3c3	-> out.xls(1!21:1)
+2!4:1 = b1s2r4c1	-> out.xls(1!22:1)
+2!4:2 = b1s2r4c2	-> out.xls(1!23:1)
+2!4:3 = 	-> out.xls(1!24:1)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!2:2 = b2s1r2c2	-> out.xls(1!1:2)
+1!2:3 = b2s1r2c3	-> out.xls(1!2:2)
+1!2:4 = b2s1r2c4	-> out.xls(1!3:2)
+1!3:2 = b2s1r3c2	-> out.xls(1!4:2)
+1!3:3 = b2s1r3c3	-> out.xls(1!5:2)
+1!3:4 = 	-> out.xls(1!6:2)
+1!4:2 = b2s1r4c2	-> out.xls(1!7:2)
+1!4:3 = b2s1r4c3	-> out.xls(1!8:2)
+1!4:4 = b2s1r4c4	-> out.xls(1!9:2)
+1!5:2 = b2s1r5c2	-> out.xls(1!10:2)
+1!5:3 = b2s1r5c3	-> out.xls(1!11:2)
+1!5:4 = 	-> out.xls(1!12:2)
+2!2:2 = b2s2r2c2	-> out.xls(1!13:2)
+2!2:3 = b2s2r2c3	-> out.xls(1!14:2)
+2!2:4 = b2s2r2c4	-> out.xls(1!15:2)
+2!3:2 = b2s2r3c2	-> out.xls(1!16:2)
+2!3:3 = b2s2r3c3	-> out.xls(1!17:2)
+2!3:4 = 	-> out.xls(1!18:2)
+2!4:2 = b2s2r4c2	-> out.xls(1!19:2)
+2!4:3 = b2s2r4c3	-> out.xls(1!20:2)
+2!4:4 = b2s2r4c4	-> out.xls(1!21:2)
+2!5:2 = b2s2r5c2	-> out.xls(1!22:2)
+2!5:3 = b2s2r5c3	-> out.xls(1!23:2)
+2!5:4 = 	-> out.xls(1!24:2)
+
+ 
+C: ..\pests -d -S -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!1:2)
+1!1:3 = b1s1r1c3	-> out.xls(1!1:3)
+1!2:1 = b1s1r2c1	-> out.xls(1!2:1)
+1!2:2 = b1s1r2c2	-> out.xls(1!2:2)
+1!2:3 = 	-> out.xls(1!2:3)
+1!3:1 = b1s1r3c1	-> out.xls(1!3:1)
+1!3:2 = b1s1r3c2	-> out.xls(1!3:2)
+1!3:3 = b1s1r3c3	-> out.xls(1!3:3)
+1!4:1 = b1s1r4c1	-> out.xls(1!4:1)
+1!4:2 = b1s1r4c2	-> out.xls(1!4:2)
+1!4:3 = 	-> out.xls(1!4:3)
+2!1:1 = b1s2r1c1	-> out.xls(2!1:1)
+2!1:2 = b1s2r1c2	-> out.xls(2!1:2)
+2!1:3 = b1s2r1c3	-> out.xls(2!1:3)
+2!2:1 = b1s2r2c1	-> out.xls(2!2:1)
+2!2:2 = b1s2r2c2	-> out.xls(2!2:2)
+2!2:3 = 	-> out.xls(2!2:3)
+2!3:1 = b1s2r3c1	-> out.xls(2!3:1)
+2!3:2 = b1s2r3c2	-> out.xls(2!3:2)
+2!3:3 = b1s2r3c3	-> out.xls(2!3:3)
+2!4:1 = b1s2r4c1	-> out.xls(2!4:1)
+2!4:2 = b1s2r4c2	-> out.xls(2!4:2)
+2!4:3 = 	-> out.xls(2!4:3)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!2:2 = b2s1r2c2	-> out.xls(3!2:2)
+1!2:3 = b2s1r2c3	-> out.xls(3!2:3)
+1!2:4 = b2s1r2c4	-> out.xls(3!2:4)
+1!3:2 = b2s1r3c2	-> out.xls(3!3:2)
+1!3:3 = b2s1r3c3	-> out.xls(3!3:3)
+1!3:4 = 	-> out.xls(3!3:4)
+1!4:2 = b2s1r4c2	-> out.xls(3!4:2)
+1!4:3 = b2s1r4c3	-> out.xls(3!4:3)
+1!4:4 = b2s1r4c4	-> out.xls(3!4:4)
+1!5:2 = b2s1r5c2	-> out.xls(3!5:2)
+1!5:3 = b2s1r5c3	-> out.xls(3!5:3)
+1!5:4 = 	-> out.xls(3!5:4)
+2!2:2 = b2s2r2c2	-> out.xls(4!2:2)
+2!2:3 = b2s2r2c3	-> out.xls(4!2:3)
+2!2:4 = b2s2r2c4	-> out.xls(4!2:4)
+2!3:2 = b2s2r3c2	-> out.xls(4!3:2)
+2!3:3 = b2s2r3c3	-> out.xls(4!3:3)
+2!3:4 = 	-> out.xls(4!3:4)
+2!4:2 = b2s2r4c2	-> out.xls(4!4:2)
+2!4:3 = b2s2r4c3	-> out.xls(4!4:3)
+2!4:4 = b2s2r4c4	-> out.xls(4!4:4)
+2!5:2 = b2s2r5c2	-> out.xls(4!5:2)
+2!5:3 = b2s2r5c3	-> out.xls(4!5:3)
+2!5:4 = 	-> out.xls(4!5:4)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!1:2)
+1!1:3 = b1s1r1c3	-> out.xls(1!1:3)
+1!2:2 = b1s1r2c2	-> out.xls(1!1:4)
+1!2:3 = 	-> out.xls(1!1:5)
+1!2:4 = 	-> out.xls(1!1:6)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!2:1)
+1!1:2 = 	-> out.xls(1!2:2)
+1!1:3 = 	-> out.xls(1!2:3)
+1!2:2 = b2s1r2c2	-> out.xls(1!2:4)
+1!2:3 = b2s1r2c3	-> out.xls(1!2:5)
+1!2:4 = b2s1r2c4	-> out.xls(1!2:6)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -R -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!2:1)
+1!1:3 = b1s1r1c3	-> out.xls(1!3:1)
+1!2:2 = b1s1r2c2	-> out.xls(1!4:1)
+1!2:3 = 	-> out.xls(1!5:1)
+1!2:4 = 	-> out.xls(1!6:1)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!1:2)
+1!1:2 = 	-> out.xls(1!2:2)
+1!1:3 = 	-> out.xls(1!3:2)
+1!2:2 = b2s1r2c2	-> out.xls(1!4:2)
+1!2:3 = b2s1r2c3	-> out.xls(1!5:2)
+1!2:4 = b2s1r2c4	-> out.xls(1!6:2)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -S -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!1:1)
+1!1:2 = b1s1r1c2	-> out.xls(1!1:2)
+1!1:3 = b1s1r1c3	-> out.xls(1!1:3)
+1!2:2 = b1s1r2c2	-> out.xls(1!1:4)
+1!2:3 = 	-> out.xls(1!1:5)
+1!2:4 = 	-> out.xls(1!1:6)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!1:1)
+1!1:2 = 	-> out.xls(1!1:2)
+1!1:3 = 	-> out.xls(1!1:3)
+1!2:2 = b2s1r2c2	-> out.xls(1!1:4)
+1!2:3 = b2s1r2c3	-> out.xls(1!1:5)
+1!2:4 = b2s1r2c4	-> out.xls(1!1:6)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -C 10:10 -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!10:10)
+1!1:2 = b1s1r1c2	-> out.xls(1!10:11)
+1!1:3 = b1s1r1c3	-> out.xls(1!10:12)
+1!2:2 = b1s1r2c2	-> out.xls(1!10:13)
+1!2:3 = 	-> out.xls(1!10:14)
+1!2:4 = 	-> out.xls(1!10:15)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!11:10)
+1!1:2 = 	-> out.xls(1!11:11)
+1!1:3 = 	-> out.xls(1!11:12)
+1!2:2 = b2s1r2c2	-> out.xls(1!11:13)
+1!2:3 = b2s1r2c3	-> out.xls(1!11:14)
+1!2:4 = b2s1r2c4	-> out.xls(1!11:15)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -C 10:10 -R -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!10:10)
+1!1:2 = b1s1r1c2	-> out.xls(1!11:10)
+1!1:3 = b1s1r1c3	-> out.xls(1!12:10)
+1!2:2 = b1s1r2c2	-> out.xls(1!13:10)
+1!2:3 = 	-> out.xls(1!14:10)
+1!2:4 = 	-> out.xls(1!15:10)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!10:11)
+1!1:2 = 	-> out.xls(1!11:11)
+1!1:3 = 	-> out.xls(1!12:11)
+1!2:2 = b2s1r2c2	-> out.xls(1!13:11)
+1!2:3 = b2s1r2c3	-> out.xls(1!14:11)
+1!2:4 = b2s1r2c4	-> out.xls(1!15:11)
+
+ 
+C: ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -C 10:10 -S -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+1!1:1 = b1s1r1c1	-> out.xls(1!10:10)
+1!1:2 = b1s1r1c2	-> out.xls(1!10:11)
+1!1:3 = b1s1r1c3	-> out.xls(1!10:12)
+1!2:2 = b1s1r2c2	-> out.xls(1!10:13)
+1!2:3 = 	-> out.xls(1!10:14)
+1!2:4 = 	-> out.xls(1!10:15)
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+1!1:1 = 	-> out.xls(1!11:10)
+1!1:2 = 	-> out.xls(1!11:11)
+1!1:3 = 	-> out.xls(1!11:12)
+1!2:2 = b2s1r2c2	-> out.xls(1!11:13)
+1!2:3 = b2s1r2c3	-> out.xls(1!11:14)
+1!2:4 = b2s1r2c4	-> out.xls(1!11:15)
+
+ 
+C: ..\pests -S  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+  Sheet 1 = Sheet1
+  Sheet 2 = Sheet2
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+  Sheet 1 = Sheet1
+  Sheet 2 = Sheet2
+
+ 
+C: ..\pests -S -t txt,xls,csv  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.csv
+  Sheet 1 = Book1
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.txt
+  Sheet 1 = Book1
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.xls
+  Sheet 1 = Sheet1
+  Sheet 2 = Sheet2
+
+FILE = C:\Users\vincen_m\tmp\TEST\Book2.xls
+  Sheet 1 = Sheet1
+  Sheet 2 = Sheet2
+
+ 
+C: ..\pests -c 1;1  
+C:\Users\vincen_m\tmp\pests.pl: in range only allows number, '!', ':', '-' or ','
+C: ..\pests -C 1:1  
+C:\Users\vincen_m\tmp\pests.pl: -C requires -W
+C: ..\pests -C 11 -W out.xls  
+C:\Users\vincen_m\tmp\pests.pl: out range only allows number, '!', ':', '-' or ','
+C: ..\pests -c 1:1;1:2;1:3 -C 1:1;1:2 -W out.xls  
+C:\Users\vincen_m\tmp\pests.pl: -c in cell count != -C out cell count
+C: ..\pests -t txt,csv -s 2 -d -W out.xls  
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.csv
+FILE = C:\Users\vincen_m\tmp\TEST\Book1.txt
+ 
