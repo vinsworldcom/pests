@@ -1,6 +1,6 @@
 @echo off
 
-echo --REMEMBER-- Edit 'orig.txt' with current directory path
+echo --REMEMBER-- Edit 'orig.log' 'FILE = ' statements with current directory path
 
 del out.log 2>nul
 

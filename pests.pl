@@ -8,7 +8,7 @@
 
 use vars qw($VERSION);
 
-$VERSION = "2.22 - 14 APR 2009";
+$VERSION = "2.3 - 27 JUL 2015";
 
 use strict;
 use warnings;
@@ -34,23 +34,21 @@ my $MAXSHEETS = 50;
 my $MAXROWS   = 65535;
 my $MAXCOLS   = 255;
 
-my ($opt_help,     $opt_man,     $opt_versions, $opt_inCells,
-    $opt_inSheet,  $opt_inType,  $opt_outCells, $opt_outRow,
-    $opt_outSheet, $opt_outWkbk, $opt_debug
-);
+my %opt;
+my ( $opt_help, $opt_man, $opt_versions );
 
 GetOptions(
-    'help!'      => \$opt_help,
-    'man!'       => \$opt_man,
-    'versions!'  => \$opt_versions,
-    'cells=s'    => \$opt_inCells,
-    'sheet=i'    => \$opt_inSheet,
-    'type=s'     => \$opt_inType,
-    'Cells=s'    => \$opt_outCells,
-    'Row!'       => \$opt_outRow,
-    'Sheet!'     => \$opt_outSheet,
-    'Workbook=s' => \$opt_outWkbk,
-    'debug!'     => \$opt_debug
+    'c|cells|incells=s'  => \$opt{inCells},
+    'C|Cells|outcells=s' => \$opt{outCells},
+    'debug!'             => \$opt{debug},
+    'Row|outrow!'        => \$opt{outRow},
+    's|sheet|insheet=i'  => \$opt{inSheet},
+    'S|Sheet|outsheet!'  => \$opt{outSheet},
+    'type=s'             => \$opt{inType},
+    'Workbook=s'         => \$opt{outWkbk},
+    'help!'              => \$opt_help,
+    'man!'               => \$opt_man,
+    'versions!'          => \$opt_versions,
 ) or pod2usage( -verbose => 0 );
 
 pod2usage( -verbose => 1 ) if defined $opt_help;
@@ -84,19 +82,19 @@ if ( defined $opt_versions ) {
 # Start Program
 ########################################################
 
-$opt_debug = $opt_debug || 0;
+$opt{debug} = $opt{debug} || 0;
 
 # Need a unique identifier for INSHEET to determine weather user specified it
 # or we set it, as we'll do in this step
-my $inSheet = $opt_inSheet || 1;    # Default sheet is the first one
+my $inSheet = $opt{inSheet} || 1;    # Default sheet is the first one
 
 # Some output options are only allowed with output workbook specified
-if ( !( defined($opt_outWkbk) ) ) {
-    if ( defined($opt_outRow) ) {
+if ( !( defined $opt{outWkbk} ) ) {
+    if ( defined $opt{outRow} ) {
         print "$0: -R requires -W\n";
         exit 1;
     }
-#    if (defined($opt_outSheet)) {
+#    if (defined $opt_outSheet) {
 #        print "$0: -S requires -W\n";
 #        exit 1
 #    }
@@ -106,28 +104,28 @@ if ( !( defined($opt_outWkbk) ) ) {
 # create a variable that contains the regex search string for
 # valid file types.  If nothing spec'd, then just .xls.
 # Input is in form:  txt,xls ... comma separated.
-if ($opt_inType) {
-    my @types = split( /,/, $opt_inType );
+if ( $opt{inType} ) {
+    my @types = split /,/, $opt{inType};
 
-    $opt_inType = 0;
+    $opt{inType} = 0;
 
     # For each type split above into the array, match against valid types and create the REGEX.
     foreach (@types) {
         if ( !( $_ =~ /^xls(?:x)*$|^txt$|^csv$/i ) ) {
             print "$0: invalid input type -- $_\n";
         } else {
-            if ($opt_inType) {
-                $opt_inType = $opt_inType . "|\\." . $_ . "\$";
+            if ( $opt{inType} ) {
+                $opt{inType} = $opt{inType} . "|\\." . $_ . "\$";
             } else {
-                $opt_inType = "\\." . $_ . "\$";
+                $opt{inType} = "\\." . $_ . "\$";
             }
         }
     }
 }
 
 # If we didn't get anything or nothing provided - default to XLS
-if ( !($opt_inType) ) {
-    $opt_inType = "\\.xls\$";
+if ( !$opt{inType} ) {
+    $opt{inType} = "\\.xls\$";
 }
 
 # Input file option.  Not provided at all?  Assume current directory
@@ -163,7 +161,7 @@ foreach my $item (@ARGV) {
 
         # Read in files from directory based on type found above
         if ( opendir( DIR, $item ) ) {
-            my @ls = grep( /$opt_inType/i, readdir(DIR) );
+            my @ls = grep( /$opt{inType}/i, readdir(DIR) );
             closedir(DIR);
 
             # Add a trailing / to each item and put it in the file list
@@ -176,7 +174,7 @@ foreach my $item (@ARGV) {
         }
 
         # Make sure we have at least 1 file to operate on
-        if ( !defined( $files[0] ) ) {
+        if ( !defined $files[0] ) {
             print "$0: no files found in input directory - $item\n";
             exit;
         }
@@ -222,12 +220,12 @@ foreach my $item (@ARGV) {
 # DONE! Parse input file options
 
 # Parse input Cell option
-if ( defined($opt_inCells) ) {
+if ( defined $opt{inCells} ) {
 
     # It must be a number range in the form:
     #   Z!x,X:y-Y; (etc...)
     # (optional NUMBER!)NUMBER(optional '-' or ',' NUMBER):NUMBER(optional '-' or ',' NUMBER)(optional ;[repeat])
-    if ( $opt_inCells !~ /^((\d+\!)*\d+([\,\-]\d+)*:\d+([\,\-]\d+)*(\;)?)+$/ )
+    if ($opt{inCells} !~ /^((\d+\!)*\d+([\,\-]\d+)*:\d+([\,\-]\d+)*(\;)?)+$/ )
     {
         print "$0: in range only allows number, '!', ':', '-' or ','\n";
         exit 1;
@@ -235,14 +233,14 @@ if ( defined($opt_inCells) ) {
 
     # Format is OK, get the cells required by parsing the argument
     # and get the output in the @inCells array
-    @inCells = &GET_RANGE_ARGS( $inSheet, $opt_inCells );
+    @inCells = &GET_RANGE_ARGS( $inSheet, $opt{inCells} );
 }
 
 # Parse output Cell option
-if ( defined($opt_outCells) ) {
+if ( defined $opt{outCells} ) {
 
     # This option requires -W out workbook.  Otherwise, we have no control over where we output things.
-    if ( !( defined($opt_outWkbk) ) ) {
+    if ( !( defined $opt{outWkbk} ) ) {
         print "$0: -C requires -W\n";
         exit 1;
     }
@@ -255,8 +253,8 @@ if ( defined($opt_outCells) ) {
     #    if ($opt_outCells !~ /^(\d+([\,\-]\d+)*:\d+([\,\-]\d+)*(\;)?)+$/) {
     #        print "$0: out range only allows number, ':', '-' or ','\n";
     #
-    if ($opt_outCells !~ /^((\d+\!)*\d+([\,\-]\d+)*:\d+([\,\-]\d+)*(\;)?)+$/ )
-    {
+    if ( $opt{outCells}
+        !~ /^((\d+\!)*\d+([\,\-]\d+)*:\d+([\,\-]\d+)*(\;)?)+$/ ) {
         print "$0: out range only allows number, '!', ':', '-' or ','\n";
         exit 1;
     }
@@ -264,7 +262,7 @@ if ( defined($opt_outCells) ) {
     # Format is OK, get the cells required by parsing the argument
     # and get the output in the @outCells array.
     # Use '1' as the default sheet if none specified in the -C argument pieces
-    @outCells = &GET_RANGE_ARGS( 1, $opt_outCells );
+    @outCells = &GET_RANGE_ARGS( 1, $opt{outCells} );
 
     # Verify 1 to 1 mapping of in/out cells.  We can't have more in or out cells or we
     # won't know where to put things.  The exception is if there is only 1 outCell provided.
@@ -287,44 +285,44 @@ $Excel->{DisplayAlerts} = 0;
 # created and then becomes part of a possible directory listing for
 # the input file parsing.  If we're debugging, we just need the filename,
 # we don't actually do anything to it, so we can skip this part.
-if ( defined($opt_outWkbk) ) {
+if ( defined $opt{outWkbk} ) {
 
     # Does it start with a \ ?  If so, add the drive otherwise, it must
     # be off the local directory, so add the current path
-    if ( !( $opt_outWkbk =~ /^[A-Za-z]:/ ) ) {
-        if ( $opt_outWkbk =~ /^\\/ ) {
+    if ( !( $opt{outWkbk} =~ /^[A-Za-z]:/ ) ) {
+        if ( $opt{outWkbk} =~ /^\\/ ) {
 
-            my @drive = split( /:/, cwd );
-            $opt_outWkbk = $drive[0] . ":" . $opt_outWkbk;
+            my @drive = split /:/, cwd;
+            $opt{outWkbk} = $drive[0] . ":" . $opt{outWkbk};
         } else {
-            $opt_outWkbk = cwd . "\\" . $opt_outWkbk;
+            $opt{outWkbk} = cwd . "\\" . $opt{outWkbk};
         }
     }
 
     # Replace all / with \ (must be \\ to escape the \) to make Windows compatible
-    $opt_outWkbk =~ s/\//\\/g;
+    $opt{outWkbk} =~ s/\//\\/g;
 
     # The following commands are stuff tried to get the broken Win32::OLE SaveAs method to work:
     #
-    # $opt_outWkbk =~ s/\\/\\\\/g;
-    # $opt_outWkbk = "'" . $opt_outWkbk . "'";
+    # $opt{outWkbk} =~ s/\\/\\\\/g;
+    # $opt{outWkbk} = "'" . $opt{outWkbk} . "'";
 
     # Done all our massaging.  Now it's time to open the file.  Check if it exists or if we
     # need to create it.
     # Does it exist?  If so, open it ...
-    if ( -e "$opt_outWkbk" ) {
+    if ( -e "$opt{outWkbk}" ) {
 
-        if ( !$opt_debug ) {
-            print "WARN:  Output file exists - $opt_outWkbk\n";
-            $outWkbk = $Excel->Workbooks->Open($opt_outWkbk);
+        if ( !$opt{debug} ) {
+            print "WARN:  Output file exists - $opt{outWkbk}\n";
+            $outWkbk = $Excel->Workbooks->Open( $opt{outWkbk} );
         }
 
         # Otherwise, create a new book.
     } else {
 
-        if ( !$opt_debug ) {
+        if ( !$opt{debug} ) {
 
-            # At this point, $opt_outWkbk is in the form:
+            # At this point, $opt{outWkbk} is in the form:
             #  DRIVE:\path\to\file.ext
             #
             # Normally, we'd be done here, but MS Excel SaveAs feature is STUPID
@@ -336,22 +334,22 @@ if ( defined($opt_outWkbk) ) {
             # I'm working on this ...
             #
             # And now, 2 days later, it's magically fixed?  Keep this here ... just in case ;-)
-#            if ($opt_outWkbk =~ /:/) {
-#                my @temp = split (/:/, $opt_outWkbk);
-#                $opt_outWkbk = "..\\..\\.." . $temp[1]
+#            if ($opt{outWkbk} =~ /:/) {
+#                my @temp = split /:/, $opt{outWkbk};
+#                $opt{outWkbk} = "..\\..\\.." . $temp[1]
 #            }
 
             # Create new output file (as per normal)
             $outWkbk = $Excel->Workbooks->Add();
             $outWkbk->SaveAs(
-                {   Filename   => $opt_outWkbk,
+                {   Filename   => $opt{outWkbk},
                     FileFormat => xlWorkbookNormal
                 }
             );
         }
     }
 
-    if ( !$opt_debug ) {
+    if ( !$opt{debug} ) {
 
         # Assign the active worksheet.  We'll start with '1' so there'll be a value in this
         # outWks variable, but it will change later as needed
@@ -381,16 +379,16 @@ foreach my $file (@files) {
     #
     # First off is to convert / back to \ in the infile name, then compare ...
     $file =~ s/\//\\/g;
-    if ( defined($opt_outWkbk) ) {
+    if ( defined $opt{outWkbk} ) {
 
-        if ( $file eq $opt_outWkbk ) {
-            if ( !$opt_debug ) {
+        if ( $file eq $opt{outWkbk} ) {
+            if ( !$opt{debug} ) {
                 print
-                  "WARN:  input file $file is same as output file $opt_outWkbk ... Skipping ...\n";
+                  "WARN:  input file $file is same as output file $opt{outWkbk} ... Skipping ...\n";
             }
             next;
         }
-        if ( !$opt_debug ) {
+        if ( !$opt{debug} ) {
             print "INFO:  processing input file - $file\n";
         }
     }
@@ -399,19 +397,19 @@ foreach my $file (@files) {
     my $inWkbk = $Excel->Workbooks->Open($file);
 
     # Print file name if we're debugging
-    if ($opt_debug) {
+    if ( $opt{debug} ) {
         print "FILE = $file\n";
     }
 
     # reset counters for next iteration
-    if ( defined($opt_outRow) ) {
+    if ( defined $opt{outRow} ) {
         $outRow = 1;
     } else {
         $outCol = 1;
     }
     my $outCellArrayCount = 0;
 
-    if ( ( !( defined($opt_outWkbk) ) ) && ( defined($opt_outSheet) ) ) {
+    if ( ( !( defined $opt{outWkbk} ) ) and ( defined $opt{outSheet} ) ) {
         print "FILE = $file\n";
         for ( 1 .. $inWkbk->Worksheets->Count() ) {
             my $inWks = $inWkbk->Worksheets($_);
@@ -425,8 +423,8 @@ foreach my $file (@files) {
 
             # Arrange inCell coordinates
             # Split each coordinate into sheet/coord and each coord into row then column
-            my (@inCoords) = split( /!/, $inCell );
-            ( $inCoords[1], $inCoords[2] ) = split( /:/, $inCoords[1] );
+            my (@inCoords) = split /!/, $inCell;
+            ( $inCoords[1], $inCoords[2] ) = split /:/, $inCoords[1];
 
             my $inWks = 0;
             my $inWkc = 0;
@@ -456,17 +454,17 @@ foreach my $file (@files) {
 
                     # Arrange outCell coordinates
                     # Split each coordinate into sheet/coord and each coord into row then column
-                    my (@outCoords) = split( /!/, $outCells[0] );
-                    ( $outCoords[1], $outCoords[2] )
-                      = split( /:/, $outCoords[1] );
+                    my (@outCoords) = split /!/, $outCells[0];
+                    ( $outCoords[1], $outCoords[2] ) = split /:/,
+                      $outCoords[1];
 
                     $outSheet = $outCoords[0];
 
                     # Have we added sheets that go beyond the existing in outbook?
                     # If so, we need to create the new sheet before we print to it
-                    if ( !$opt_debug ) {
+                    if ( !$opt{debug} ) {
                         if ( $outSheet > $outWkbk->Worksheets->Count() ) {
-                            &AddSheets( $outSheet, $opt_outWkbk, $outWkbk );
+                            &AddSheets( $outSheet, $opt{outWkbk}, $outWkbk );
                         }
                         $outWks = $outWkbk->Worksheets(
                             Variant( VT_I4, $outSheet ) );
@@ -479,7 +477,7 @@ foreach my $file (@files) {
                     # the input file we're writing ($outCellArrayCount can do this as it counts along
                     # which output cell we'd be using) and which file we're on to increase our row
                     # (or col if -R provided) (fileLoopCount can do this).
-                    if ( defined($opt_outRow) ) {
+                    if ( defined $opt{outRow} ) {
                         $outCol = $fileLoopCount + $outCoords[2];
                         $outRow = $outCellArrayCount + $outCoords[1];
                     } else {
@@ -493,18 +491,18 @@ foreach my $file (@files) {
 
                     # Arrange outCell coordinates
                     # Split each coordinate into sheet/coord and each coord into row then column
-                    my (@outCoords)
-                      = split( /!/, $outCells[$outCellArrayCount] );
-                    ( $outCoords[1], $outCoords[2] )
-                      = split( /:/, $outCoords[1] );
+                    my (@outCoords) = split /!/,
+                      $outCells[$outCellArrayCount];
+                    ( $outCoords[1], $outCoords[2] ) = split /:/,
+                      $outCoords[1];
 
                     $outSheet = $outCoords[0];
 
                     # Have we added sheets that go beyond the existing in outbook?
                     # If so, we need to create the new sheet before we print to it
-                    if ( !$opt_debug ) {
+                    if ( !$opt{debug} ) {
                         if ( $outSheet > $outWkbk->Worksheets->Count() ) {
-                            &AddSheets( $outSheet, $opt_outWkbk, $outWkbk );
+                            &AddSheets( $outSheet, $opt{outWkbk}, $outWkbk );
                         }
                         $outWks = $outWkbk->Worksheets(
                             Variant( VT_I4, $outSheet ) );
@@ -516,7 +514,7 @@ foreach my $file (@files) {
 
                     # We need to increment by column or row the outcell count per new file
                     # This is determind by default = Row or is -R, then by column
-                    if ( defined($opt_outRow) ) {
+                    if ( ( $opt{outRow} ) ) {
                         $outCol = $outCol + $fileLoopCount;
                     } else {
                         $outRow = $outRow + $fileLoopCount;
@@ -528,14 +526,11 @@ foreach my $file (@files) {
                 $outCellArrayCount++;
             }
 
-            &PrintAll(
-                $inCoords[0], $inCoords[1], $inCoords[2], $inWkc,
-                $outSheet,    $outRow,      $outCol,      $outWks,
-                $opt_outWkbk, $opt_debug
-            );
+            &PrintAll( $inCoords[0], $inCoords[1], $inCoords[2], $inWkc,
+                $outSheet, $outRow, $outCol, $outWks, );
 
             # Do we increment by row or column?
-            if ( defined($opt_outRow) ) {
+            if ( defined $opt{outRow} ) {
                 $outRow++;
             } else {
                 $outCol++;
@@ -550,16 +545,16 @@ foreach my $file (@files) {
         my $lastSheet  = $inWkbk->Worksheets->Count();
 
         # If the user specified a default sheet ...
-        if ( defined($opt_inSheet) ) {
+        if ( defined $opt{inSheet} ) {
 
             # That is greater than the number of sheets in this file, no use printing errors
             # for everything, just skip this file and go the NEXT one in the foreach files loop ...
-            if ( $opt_inSheet > $lastSheet ) {
+            if ( $opt{inSheet} > $lastSheet ) {
                 next
 
                   # Otherwise, the user specified sheet is the only one we operate on
             } else {
-                $startSheet = $lastSheet = $opt_inSheet;
+                $startSheet = $lastSheet = $opt{inSheet};
             }
         }
 
@@ -567,8 +562,8 @@ foreach my $file (@files) {
         # check again anyway rather than just saying (@outCells).  If it is provided at this point,
         # we're using it as a starting anchor point for output.  See above comments relating to this.
         if ( @outCells == 1 ) {
-            my (@outCoords) = split( /!/, $outCells[0] );
-            ( $outCoords[1], $outCoords[2] ) = split( /:/, $outCoords[1] );
+            my (@outCoords) = split /!/, $outCells[0];
+            ( $outCoords[1], $outCoords[2] ) = split /:/, $outCoords[1];
 
             # If we're in sheet mapping mode, we use the outcoords as a starting anchor point
             # and we're just mapping so no increase by filecount or outcoords
@@ -577,21 +572,21 @@ foreach my $file (@files) {
 
             # Have we added sheets that go beyond the existing in outbook?
             # If so, we need to create the new sheet before we print to it
-            if ( !$opt_debug ) {
+            if ( !$opt{debug} ) {
                 if ( $outSheet > $outWkbk->Worksheets->Count() ) {
-                    &AddSheets( $outSheet, $opt_outWkbk, $outWkbk );
+                    &AddSheets( $outSheet, $opt{outWkbk}, $outWkbk );
                 }
                 $outWks = $outWkbk->Worksheets( Variant( VT_I4, $outSheet ) );
             }
 
-            if ( defined($opt_outSheet) ) {
+            if ( defined $opt{outSheet} ) {
                 $outRow = $outCoords[1];
                 $outCol = $outCoords[2]
 
             } else {
 
                 # Assign the working cell
-                if ( defined($opt_outRow) ) {
+                if ( defined $opt{outRow} ) {
                     $outCol = $fileLoopCount + $outCoords[2];
                     $outRow = $outCellArrayCount + $outCoords[1];
                 } else {
@@ -613,13 +608,11 @@ foreach my $file (@files) {
             # BUT FIRST, we need to make sure we can find a min row, otherwise there is
             # nothing in the sheet and we'll get errors.  So, if an empty sheet is found
             # skip it.
-            if (!(  defined(
-                        $inWks->UsedRange->Find(
-                            {   What            => "*",
-                                SearchDirection => xlNext,
-                                SearchOrder     => xlByRows
-                            }
-                        )
+            if (!(  defined $inWks->UsedRange->Find(
+                        {   What            => "*",
+                            SearchDirection => xlNext,
+                            SearchOrder     => xlByRows
+                        }
                     )
                 )
               ) {
@@ -666,13 +659,13 @@ foreach my $file (@files) {
 
                     # If sheet mapping mode, we need to set the output anchor point as the input
                     # cell (mapping) plus any output anchor
-                    if ( defined($opt_outSheet) ) {
+                    if ( defined $opt{outSheet} ) {
 
                         # Have we added sheets that go beyond the existing in outbook?
                         # If so, we need to create the new sheet before we print to it
-                        if ( !$opt_debug ) {
+                        if ( !$opt{debug} ) {
                             if ( $outSheet > $outWkbk->Worksheets->Count() ) {
-                                &AddSheets( $outSheet, $opt_outWkbk,
+                                &AddSheets( $outSheet, $opt{outWkbk},
                                     $outWkbk );
                             }
                             $outWks = $outWkbk->Worksheets(
@@ -683,21 +676,18 @@ foreach my $file (@files) {
                         $outCol = $outCol + $iC - 1;
                     }
 
-                    &PrintAll(
-                        $i,           $iR,     $iC,     $inWkc,
-                        $outSheet,    $outRow, $outCol, $outWks,
-                        $opt_outWkbk, $opt_debug
-                    );
+                    &PrintAll( $i, $iR, $iC, $inWkc,
+                        $outSheet, $outRow, $outCol, $outWks, );
 
                     # If we're in sheet mapping mode, we need to reset our anchor point
-                    if ( defined($opt_outSheet) ) {
+                    if ( defined $opt{outSheet} ) {
                         $outRow = $outRow - $iR + 1;
                         $outCol = $outCol - $iC + 1
 
                     } else {
 
                         # Do we increment by row or column?
-                        if ( defined($opt_outRow) ) {
+                        if ( defined $opt{outRow} ) {
                             $outRow++;
                         } else {
                             $outCol++;
@@ -709,7 +699,7 @@ foreach my $file (@files) {
 
             # If we're in sheet mapping mode, we need to create a new sheet if the in book
             # has another sheet to do
-            if ( defined($opt_outSheet) ) {
+            if ( defined $opt{outSheet} ) {
                 $outSheet++;
                 $sheetCount++;
             }
@@ -722,8 +712,8 @@ foreach my $file (@files) {
 
     # Get ready for next Workbook
     # Do we increment by row or column?  By default, we're adding to the row, unless -R specified
-    if ( !defined($opt_outSheet) ) {
-        if ( defined($opt_outRow) ) {
+    if ( !defined $opt{outSheet} ) {
+        if ( defined $opt{outRow} ) {
             $outCol++;
         } else {
             $outRow++;
@@ -732,15 +722,15 @@ foreach my $file (@files) {
 
     # Add one to the file loop count as we're going on to the next file
     $fileLoopCount++;
-    print "\n" if ( !( defined($outWkbk) ) )
+    print "\n" if ( !( defined $outWkbk ) )
 
 }
 # DONE! All files parsed after loop complete
 
-if ( defined($outWkbk) ) {
+if ( defined $outWkbk ) {
 
     $outWkbk->SaveAs(
-        {   Filename   => $opt_outWkbk,
+        {   Filename   => $opt{outWkbk},
             FileFormat => xlWorkbookNormal
         }
     );
@@ -760,22 +750,20 @@ sub PrintAll () {
 
     use strict;
 
-    my ($iS,     $iR,     $iC,     $inWkc,       $outSheet,
-        $outRow, $outCol, $outWks, $opt_outWkbk, $opt_debug
-    ) = @_;
+    my ( $iS, $iR, $iC, $inWkc, $outSheet, $outRow, $outCol, $outWks, ) = @_;
 
     # Debug printing? ...
-    if ($opt_debug) {
+    if ( $opt{debug} ) {
         print "$iS!$iR:$iC = ";
-        print $inWkc if ( defined($inWkc) );
+        print $inWkc if ( defined $inWkc );
 
-        if ( defined($opt_outWkbk) ) {
+        if ( defined $opt{outWkbk} ) {
 
             # It would be brilliant if this worked; however, since Win32::OLE SUCKS and needs the
             # full filename and the rest of the world can deal with relative paths, I need to
             # convert the possible relative path of the outworkbook provided and compare that to the
             # fully qualifed path in file we're looping on.  I'll try to fix this later.
-            my @filename = split( /\\/, $opt_outWkbk );
+            my @filename = split /\\/, $opt{outWkbk};
 
             printf "\t-> %s", $filename[scalar(@filename) - 1];
             print "(", $outSheet, "!", $outRow, ":", $outCol, ")";
@@ -786,17 +774,17 @@ sub PrintAll () {
     } else {
 
         # Normal printing to output workbook
-        if ( defined($opt_outWkbk) ) {
+        if ( defined $opt{outWkbk} ) {
 
             $outWks->Cells( Variant( VT_I4, $outRow ),
                 Variant( VT_I4, $outCol ) )->{Value} = $inWkc
-              if ( defined($inWkc) )
+              if ( defined $inWkc )
 
               # Normal printing to STDOUT
         } else {
 
             # Print if value exists
-            if ( defined($inWkc) ) {
+            if ( defined $inWkc ) {
                 print $inWkc;
             }
             print "\t";
@@ -852,7 +840,7 @@ sub GET_RANGE_ARGS () {
     my ( @final, @temp, @sheet, @row, @col );
 
     # Split the string at the commas first to get
-    my (@option) = split( /;/, $opt );
+    my (@option) = split /;/, $opt;
 
     # We need a row/column counter for the main loop
     # We're going to split each option at the row:col demark
@@ -866,8 +854,8 @@ sub GET_RANGE_ARGS () {
         }
 
         # Split the group into sheet, row and column
-        my (@coords) = split( /!/, $group );
-        ( $coords[1], $coords[2] ) = split( /:/, $coords[1] );
+        my (@coords) = split /!/, $group;
+        ( $coords[1], $coords[2] ) = split /:/, $coords[1];
 
         # Reset counters and arrays for the new group
         my $SRC = 0;
@@ -877,7 +865,7 @@ sub GET_RANGE_ARGS () {
         foreach my $coord (@coords) {
 
             # Split each coordinate by commas
-            my (@value) = split( /,/, $coord );
+            my (@value) = split /,/, $coord;
 
             # Now we'll loop through the remaining values to see if there are
             # dashes.  Dashes means all numbers between, inclusive.  Thus, we'll
@@ -894,7 +882,7 @@ sub GET_RANGE_ARGS () {
                     # admit to this procedure, so we just get the length of the array
                     # after the split and assign that to a variable that we'll use as the
                     # upper range limit
-                    my (@startEnd) = split( /-/, $value );
+                    my (@startEnd) = split /-/, $value;
 
                     if ( $startEnd[0] <= $startEnd[$#startEnd] ) {
 
