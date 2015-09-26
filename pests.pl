@@ -1007,7 +1007,7 @@ of the cells in the provided command line argument.
              Ranges will iterate across columns, then down rows.  For 
              example:
 
-                1-3:4-5
+                1-3:4-6
 
              Evalutes to:
 
