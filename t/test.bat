@@ -23,6 +23,8 @@ del out.log 2>nul
 >> commands.log echo ..\pests -d -c 1:1;1:2;1:3;2:2;2:3;2:4 -C 10:10 -S -W out.xls
 >> commands.log echo ..\pests -S
 >> commands.log echo ..\pests -S -t txt,xls,csv
+>> commands.log echo ..\pests -r Book1.xls
+>> commands.log echo ..\pests -F Book1.xls
 
 REM ERRORS
 >> commands.log echo ..\pests -c 1;1

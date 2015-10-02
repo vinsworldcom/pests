@@ -8,7 +8,7 @@
 
 use vars qw($VERSION);
 
-$VERSION = "2.3 - 27 JUL 2015";
+$VERSION = "2.4 - 02 OCT 2015";
 
 use strict;
 use warnings;
@@ -27,13 +27,6 @@ use Win32::OLE::Variant;
 # End Additional USE
 ########################################################
 
-# GLOBAL variables
-my ( @files, @inCells, @outCells );
-my ( $outWkbk, $outWks );
-my $MAXSHEETS = 50;
-my $MAXROWS   = 65535;
-my $MAXCOLS   = 255;
-
 my %opt;
 my ( $opt_help, $opt_man, $opt_versions );
 
@@ -41,6 +34,8 @@ GetOptions(
     'c|cells|incells=s'  => \$opt{inCells},
     'C|Cells|outcells=s' => \$opt{outCells},
     'debug!'             => \$opt{debug},
+    'Formulas!'          => \$opt{formula},
+    'rows!'              => \$opt{rows},
     'Row|outrow!'        => \$opt{outRow},
     's|sheet|insheet=i'  => \$opt{inSheet},
     'S|Sheet|outsheet!'  => \$opt{outSheet},
@@ -64,12 +59,12 @@ if ( defined $opt_versions ) {
       "    Getopt::Long        $Getopt::Long::VERSION\n",
       "    Pod::Usage          $Pod::Usage::VERSION\n",
 ########################################################
-# Start Additional USE
+      # Start Additional USE
 ########################################################
       "    Cwd                 $Cwd::VERSION\n",
       "    Win32::OLE          $Win32::OLE::VERSION\n",
 ########################################################
-# End Additional USE
+      # End Additional USE
 ########################################################
       "    Perl version        $]\n",
       "    Perl executable     $^X\n",
@@ -81,8 +76,20 @@ if ( defined $opt_versions ) {
 ########################################################
 # Start Program
 ########################################################
+# GLOBAL variables
+my ( @files, @inCells, @outCells );
+my ( $outWkbk, $outWks );
+my $MAXSHEETS = 50;
+my $MAXROWS   = 65535;
+my $MAXCOLS   = 255;
 
 $opt{debug} = $opt{debug} || 0;
+$opt{row}   = $opt{row}   || 0;
+if ( defined $opt{formula} ) {
+    $opt{formula} = 'Formula';
+} else {
+    $opt{formula} = 'Value';
+}
 
 # Need a unique identifier for INSHEET to determine weather user specified it
 # or we set it, as we'll do in this step
@@ -94,10 +101,11 @@ if ( !( defined $opt{outWkbk} ) ) {
         print "$0: -R requires -W\n";
         exit 1;
     }
-#    if (defined $opt_outSheet) {
-#        print "$0: -S requires -W\n";
-#        exit 1
-#    }
+
+    #    if (defined $opt_outSheet) {
+    #        print "$0: -S requires -W\n";
+    #        exit 1
+    #    }
 }
 
 # Determine if the user spec'd an input type and validate it,
@@ -217,6 +225,7 @@ foreach my $item (@ARGV) {
         }
     }
 }
+
 # DONE! Parse input file options
 
 # Parse input Cell option
@@ -334,10 +343,10 @@ if ( defined $opt{outWkbk} ) {
             # I'm working on this ...
             #
             # And now, 2 days later, it's magically fixed?  Keep this here ... just in case ;-)
-#            if ($opt{outWkbk} =~ /:/) {
-#                my @temp = split /:/, $opt{outWkbk};
-#                $opt{outWkbk} = "..\\..\\.." . $temp[1]
-#            }
+            #            if ($opt{outWkbk} =~ /:/) {
+            #                my @temp = split /:/, $opt{outWkbk};
+            #                $opt{outWkbk} = "..\\..\\.." . $temp[1]
+            #            }
 
             # Create new output file (as per normal)
             $outWkbk = $Excel->Workbooks->Add();
@@ -441,7 +450,7 @@ foreach my $file (@files) {
                 $inWkc = $inWks->Cells(
                     Variant( VT_I4, $inCoords[1] ),
                     Variant( VT_I4, $inCoords[2] )
-                )->{Value};
+                )->{$opt{formula}};
             }
 
             # Arrange out cell coordinates (if provided)
@@ -618,44 +627,71 @@ foreach my $file (@files) {
               ) {
                 next;
             }
-            my $MinRow = $inWks->UsedRange->Find(
+
+            my %coords = (
+                inside    => 'Column',
+                outside   => 'Row',
+                searchIn  => xlByColumns,
+                searchOut => xlByRows,
+            );
+
+            if ( $opt{rows} ) {
+                $coords{inside}    = 'Row';
+                $coords{outside}   = 'Column';
+                $coords{searchIn}  = xlByRows;
+                $coords{searchOut} = xlByColumns;
+            }
+
+            $coords{'Min' . $coords{outside}} = $inWks->UsedRange->Find(
                 {   What            => "*",
                     SearchDirection => xlNext,
-                    SearchOrder     => xlByRows
+                    SearchOrder     => $coords{searchOut}
                 }
-            )->{Row};
-            my $MaxRow = $inWks->UsedRange->Find(
+            )->{$coords{outside}};
+            $coords{'Max' . $coords{outside}} = $inWks->UsedRange->Find(
                 {   What            => "*",
                     SearchDirection => xlPrevious,
-                    SearchOrder     => xlByRows
+                    SearchOrder     => $coords{searchOut}
                 }
-            )->{Row};
+            )->{$coords{outside}};
 
-            for ( my $iR = $MinRow; defined $MaxRow && $iR <= $MaxRow; $iR++ )
-            {
+            for (
+                my $iO = $coords{'Min' . $coords{outside}};
+                defined $coords{'Max' . $coords{outside}}
+                && $iO <= $coords{'Max' . $coords{outside}};
+                $iO++
+              ) {
 
                 # Next, we read by cols - find min/max and iterate them
-                my $MinCol = $inWks->UsedRange->Find(
+                $coords{'Min' . $coords{inside}} = $inWks->UsedRange->Find(
                     {   What            => "*",
                         SearchDirection => xlNext,
-                        SearchOrder     => xlByColumns
+                        SearchOrder     => $coords{searchIn}
                     }
-                )->{Column};
-                my $MaxCol = $inWks->UsedRange->Find(
+                )->{$coords{inside}};
+                $coords{'Max' . $coords{inside}} = $inWks->UsedRange->Find(
                     {   What            => "*",
                         SearchDirection => xlPrevious,
-                        SearchOrder     => xlByColumns
+                        SearchOrder     => $coords{searchIn}
                     }
-                )->{Column};
+                )->{$coords{inside}};
 
                 for (
-                    my $iC = $MinCol;
-                    defined $MaxCol && $iC <= $MaxCol;
-                    $iC++
+                    my $iI = $coords{'Min' . $coords{inside}};
+                    defined $coords{'Max' . $coords{inside}}
+                    && $iI <= $coords{'Max' . $coords{inside}};
+                    $iI++
                   ) {
 
+                    my $iR = $iO;
+                    my $iC = $iI;
+                    if ( $opt{rows} ) {
+                        $iR = $iI;
+                        $iC = $iO;
+                    }
+
                     # Assign working cell
-                    my $inWkc = $inWks->Cells( $iR, $iC )->{Value};
+                    my $inWkc = $inWks->Cells( $iR, $iC )->{$opt{formula}};
 
                     # If sheet mapping mode, we need to set the output anchor point as the input
                     # cell (mapping) plus any output anchor
@@ -725,6 +761,7 @@ foreach my $file (@files) {
     print "\n" if ( !( defined $outWkbk ) )
 
 }
+
 # DONE! All files parsed after loop complete
 
 if ( defined $outWkbk ) {
@@ -747,8 +784,6 @@ if ( defined $outWkbk ) {
 # Print All                     #
 #################################
 sub PrintAll () {
-
-    use strict;
 
     my ( $iS, $iR, $iC, $inWkc, $outSheet, $outRow, $outCol, $outWks, ) = @_;
 
@@ -798,8 +833,6 @@ sub PrintAll () {
 #################################
 sub AddSheets () {
 
-    use strict;
-
     my ( $outS, $outW, $outWkbk ) = @_;
 
     print "WARN:  Worksheet $outS does not exist in output file - $outW\n";
@@ -832,8 +865,6 @@ sub AddSheets () {
 #          Z!X:Y
 #          Where Z is sheet, X is row and Y is column.  We use the ! and : to split later
 sub GET_RANGE_ARGS () {
-
-    use strict;
 
     my ( $sheet, $opt ) = @_;
 
@@ -1021,6 +1052,9 @@ of the cells in the provided command line argument.
                        on all sheets for all input files and parse 
                        accordingly.
 
+ -r          Iterate down rows, then across columns when reading.
+ --rows      DEFAULT:  Iterate across columns, then down rows.
+
  -s #        Default worksheet of input Excel Workbook.  With -c, if 
  --sheet     SHEET! is not specified, default is 1.  This option allows 
              the changing of the default sheet.
@@ -1041,6 +1075,9 @@ of the cells in the provided command line argument.
                 -t csv,xls
 
 =head2 OUTPUT OPTIONS
+
+ -F          Output formulas instead of values where found.
+ -Formulas   DEFAULT:  Output values.
 
  -W wkbk     Output Excel workbook in .XLS format.
  --Workbook  DEFAULT:  (or not specified) Output tab-delimited text to 

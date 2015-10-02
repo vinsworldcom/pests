@@ -408,6 +408,12 @@ FILE = %USERPROFILE%\tmp\pests\t\Book2.xls
   Sheet 2 = Sheet2
 
  
+C: ..\pests -r Book1.xls  
+b1s1r1c1	b1s1r2c1	b1s1r3c1	b1s1r4c1	b1s1r1c2	b1s1r2c2	b1s1r3c2	b1s1r4c2	b1s1r1c3		b1s1r3c3		b1s2r1c1	b1s2r2c1	b1s2r3c1	b1s2r4c1	b1s2r1c2	b1s2r2c2	b1s2r3c2	b1s2r4c2	b1s2r1c3		b1s2r3c3		
+ 
+C: ..\pests -F Book1.xls  
+b1s1r1c1	b1s1r1c2	b1s1r1c3	b1s1r2c1	b1s1r2c2		b1s1r3c1	b1s1r3c2	b1s1r3c3	=IF(A3<>"","b1s1r4c1", "")	=IF(B3<>"","b1s1r4c2","")		b1s2r1c1	b1s2r1c2	b1s2r1c3	b1s2r2c1	b1s2r2c2		b1s2r3c1	b1s2r3c2	b1s2r3c3	b1s2r4c1	b1s2r4c2		
+ 
 C: ..\pests -c 1;1  
 %USERPROFILE%\tmp\pests\pests.pl: in range only allows number, '!', ':', '-' or ','
 C: ..\pests -C 1:1  
